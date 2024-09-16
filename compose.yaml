@@ -1,0 +1,50 @@
+name: taski
+
+volumes:
+  pg_data:
+    name: taski_pg_data
+  static:
+    name: taski_static
+
+networks:
+  db:
+    name: taski_net-db
+  backend:
+    name: taski_net-backend
+
+services:
+  db:
+    image: postgres:13.16-alpine
+    container_name: taski_db
+    user: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      args:
+        - PYTHON_VERSION=3.9.20-alpine
+    container_name: taski_backend
+    env_file: .env
+    networks:
+      - db
+    volumes:
+      - static:/app/collected_static
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - 127.0.0.1:8000:8000
