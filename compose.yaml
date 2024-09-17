@@ -46,5 +46,11 @@ services:
       db:
         condition: service_healthy
 
-    ports:
-      - 127.0.0.1:8000:8000
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - NODE_VERSION=20.17-alpine
+    container_name: taski_frontend
+    volumes:
+      - static:/app/build
