@@ -2,6 +2,10 @@ ARG PYTHON_VERSION=3.9.20-alpine
 
 FROM python:${PYTHON_VERSION}
 
+ENV PYTHONDONTWRITEBYTECODE=1
+
+ENV PYTHONUNBUFFERED=1
+
 RUN addgroup -S web && \
   adduser -S -G web web
 
@@ -10,10 +14,6 @@ USER web
 WORKDIR /app
 
 RUN mkdir collected_static
-
-ENV PYTHONDONTWRITEBYTECODE=1
-
-ENV PYTHONUNBUFFERED=1
 
 USER root
 
